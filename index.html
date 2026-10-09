@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Redaman Fiber Optik - GPON Link Budget Pro PWA</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PWA Manifest & Theme -->
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" id="pwaManifest">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-full flex flex-col">
+
+    <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-blue-600 p-2.5 rounded-xl text-white shadow-lg shadow-blue-500/30">
+                    <i class="fa-solid fa-network-wired text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white">FO Link Budget Pro PWA</h1>
+                    <p class="text-xs text-slate-400">GPON / ODC / ODP Cascading Calculator & Offline Ready</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="installBtn" style="display: none;" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-lg shadow-emerald-600/20">
+                    <i class="fa-solid fa-download"></i> Install App
+                </button>
+                <div class="hidden sm:flex items-center space-x-2 text-xs bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-600">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span class="text-slate-300 font-medium">PWA Active</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- LEFT COLUMN: INPUT PARAMETERS -->
+        <div class="lg:col-span-7 space-y-6">
+
+            <!-- Card -1: Identifikasi Titik ODP / Pelanggan -->
+            <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-xl p-5 sm:p-6">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-700">
+                    <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-location-dot text-blue-400"></i> Identitas Lokasi / Titik ODP
+                    </h2>
+                    <span class="text-xs bg-emerald-500/20 text-emerald-300 font-medium px-2.5 py-1 rounded-full border border-emerald-500/30">Custom Tag</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-medium text-slate-300">Nama Titik / Nama Pelanggan / ODP</label>
+                        <input type="text" id="odpName" value="ODP-SMP-A01 / Pelanggan Budi" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Contoh: ODP-BAROKAH-01">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-medium text-slate-300">Catatan / Keterangan Jalur</label>
+                        <input type="text" id="odpNote" value="Kabel Dropcore Core 2" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Contoh: Jalur Utama RT 02">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 0: OLT SFP Server Transceiver -->
+            <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-xl p-5 sm:p-6">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-700">
+                    <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-server text-blue-400"></i> Sumber Daya OLT SFP Server
+                    </h2>
+                    <span class="text-xs bg-indigo-500/20 text-indigo-300 font-medium px-2.5 py-1 rounded-full border border-indigo-500/30">TX Power</span>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-medium text-slate-300">Pilih Tipe SFP / Masukkan TX Power</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <select id="sfpPreset" class="sm:col-span-2 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                                <option value="custom">-- Kustom / Manual --</option>
+                                <option value="2.5">GPON Class B+ (+1.5 s.d +5 dBm) [Default: +2.5 dBm]</option>
+                                <option value="5.0" selected>GPON Class C+ (+3 s.d +7 dBm) [Default: +5.0 dBm]</option>
+                                <option value="7.0">GPON Class C++ (+5 s.d +9 dBm) [Default: +7.0 dBm]</option>
+                                <option value="3.0">EPON PX20 (+2 s.d +5 dBm) [Default: +3.0 dBm]</option>
+                            </select>
+                            <div class="relative">
+                                <input type="number" id="txPower" value="5.0" step="0.1" class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-3.5 pr-14 py-2.5 text-sm text-slate-100 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                                <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-semibold">dBm</span>
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1">Daya optik pancaran awal dari port SFP di OLT server.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 1: Splitter Cascading -->
+            <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-xl p-5 sm:p-6">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-700">
+                    <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-code-branch text-blue-400"></i> Konfigurasi Splitter (Cascading)
+                    </h2>
+                    <span class="text-xs bg-blue-500/20 text-blue-300 font-medium px-2.5 py-1 rounded-full border border-blue-500/30">Bertingkat</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Splitter 1 -->
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-medium text-slate-300">Splitter 1 (ODC / Utama)</label>
+                        <select id="splitter1" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                            <option value="0">Tanpa Splitter (1:1)</option>
+                            <option value="3.7">1:2 (~3.7 dB)</option>
+                            <option value="7.2">1:4 (~7.2 dB)</option>
+                            <option value="10.5" selected>1:8 (~10.5 dB)</option>
+                            <option value="13.8">1:16 (~13.8 dB)</option>
+                            <option value="17.0">1:32 (~17.0 dB)</option>
+                            <option value="20.5">1:64 (~20.5 dB)</option>
+                        </select>
+                        <p class="text-[11px] text-slate-400" id="loss1-desc">Redaman: 10.5 dB</p>
+                    </div>
+
+                    <!-- Splitter 2 -->
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-medium text-slate-300">Splitter 2 (ODP / Distribusi)</label>
+                        <select id="splitter2" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                            <option value="0">Tanpa Splitter (1:1)</option>
+                            <option value="3.7">1:2 (~3.7 dB)</option>
+                            <option value="7.2" selected>1:4 (~7.2 dB)</option>
+                            <option value="10.5">1:8 (~10.5 dB)</option>
+                            <option value="13.8">1:16 (~13.8 dB)</option>
+                            <option value="17.0">1:32 (~17.0 dB)</option>
+                        </select>
+                        <p class="text-[11px] text-slate-400" id="loss2-desc">Redaman: 7.2 dB</p>
+                    </div>
+                </div>
+
+                <!-- Preset Quick Buttons for Technicians -->
+                <div class="mt-4 pt-3 border-t border-slate-700/50 flex flex-wrap items-center gap-2">
+                    <span class="text-xs text-slate-400">Preset Cepat:</span>
+                    <button type="button" onclick="setSplitterPreset(10.5, 7.2)" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 px-2.5 py-1 rounded-lg transition border border-slate-600">1:8 + 1:4 (Default)</button>
+                    <button type="button" onclick="setSplitterPreset(7.2, 7.2)" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 px-2.5 py-1 rounded-lg transition border border-slate-600">1:4 + 1:4</button>
+                    <button type="button" onclick="setSplitterPreset(13.8, 0)" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 px-2.5 py-1 rounded-lg transition border border-slate-600">1:16 Tunggal</button>
+                    <button type="button" onclick="setSplitterPreset(10.5, 10.5)" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 px-2.5 py-1 rounded-lg transition border border-slate-600">1:8 + 1:8</button>
+                </div>
+            </div>
+
+            <!-- Card 2: Cable & Accessories Parameters -->
+            <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-xl p-5 sm:p-6 space-y-4">
+                <h2 class="text-base font-semibold text-slate-200 flex items-center gap-2 pb-3 border-b border-slate-700">
+                    <i class="fa-solid fa-sliders text-blue-400"></i> Parameter Kabel & Aksesoris
+                </h2>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Panjang Gelombang -->
+                    <div class="space-y-1.5 sm:col-span-2">
+                        <label class="block text-xs font-medium text-slate-300">Panjang Gelombang (Wavelength)</label>
+                        <select id="wavelength" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                            <option value="1310">1310 nm (Upstream / Standar)</option>
+                            <option value="1490" selected>1490 nm (GPON Downlink Standard)</option>
+                            <option value="1550">1550 nm (CATV / RF Overlay)</option>
+                        </select>
+                    </div>
+
+                    <!-- Panjang Kabel -->
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-medium text-slate-300">Jarak / Panjang Kabel</label>
+                        <div class="relative">
+                            <input type="number" id="cableDistance" value="3.5" step="0.1" min="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-3.5 pr-14 py-2.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                            <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-semibold">km</span>
+                        </div>
+                    </div>
+
+                    <!-- Redaman per KM -->
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-medium text-slate-300">Redaman Kabel (Loss/km)</label>
+                        <div class="relative">
+                            <input type="number" id="lossPerKm" value="0.35" step="0.05" min="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-3.5 pr-16 py-2.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                            <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-semibold">dB/km</span>
+                        </div>
+                    </div>
+
+                    <!-- Jumlah Splicing -->
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-medium text-slate-300">Jumlah Sambungan (Splicing)</label>
+                        <div class="flex items-center space-x-2">
+                            <input type="number" id="splicingCount" value="3" min="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                            <span class="text-xs text-slate-400 whitespace-nowrap">@ 0.05 dB</span>
+                        </div>
+                    </div>
+
+                    <!-- Jumlah Konektor -->
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-medium text-slate-300">Jumlah Konektor / Adaptor</label>
+                        <div class="flex items-center space-x-2">
+                            <input type="number" id="connectorCount" value="2" min="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                            <span class="text-xs text-slate-400 whitespace-nowrap">@ 0.5 dB</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: RESULTS & BREAKDOWN -->
+        <div class="lg:col-span-5 space-y-6">
+            
+            <div id="resultCard" class="bg-gradient-to-br from-slate-800 to-slate-850 rounded-2xl border-2 border-slate-700 shadow-2xl p-6 relative overflow-hidden transition-all duration-300">
+                <!-- Status Badge Banner Top Right -->
+                <div id="statusBadge" class="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+                    <span id="statusDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="statusText">Aman</span>
+                </div>
+
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Hasil Perhitungan Akhir</h3>
+                <p class="text-xs text-slate-500 mb-6">Estimasi daya terima (RX Power) di sisi ONU Pelanggan</p>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <!-- RX Power Display -->
+                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/60">
+                        <span class="text-xs text-slate-400 block mb-1">Daya Terima (RX)</span>
+                        <div class="flex items-baseline space-x-1.5">
+                            <span id="rxPowerVal" class="text-3xl font-extrabold text-white">-13.43</span>
+                            <span class="text-sm font-semibold text-blue-400">dBm</span>
+                        </div>
+                    </div>
+
+                    <!-- Total Loss Display -->
+                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/60">
+                        <span class="text-xs text-slate-400 block mb-1">Total Redaman</span>
+                        <div class="flex items-baseline space-x-1.5">
+                            <span id="totalLossVal" class="text-3xl font-extrabold text-white">18.43</span>
+                            <span class="text-sm font-semibold text-amber-400">dB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Receiver sensitivity guide alert box -->
+                <div id="statusMessageBox" class="bg-emerald-950/40 border border-emerald-800/50 rounded-xl p-3.5 text-xs text-emerald-200 flex items-start gap-2.5">
+                    <i class="fa-solid fa-circle-check text-emerald-400 text-base mt-0.5"></i>
+                    <div>
+                        <strong class="font-semibold block mb-0.5 text-emerald-300" id="msgTitle">Sinyal Layak & Ideal (-8 s.d -24 dBm)</strong>
+                        <p id="msgDesc" class="text-emerald-300/80 leading-relaxed">Nilai RX Power berada dalam rentang optimal GPON. Layanan internet stabil dan optimal.</p>
+                    </div>
+                </div>
+
+                <!-- Action / Copy WhatsApp Report Button -->
+                <div class="mt-5 pt-4 border-t border-slate-700 flex gap-3">
+                    <button type="button" onclick="copyReport()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30">
+                        <i class="fa-brands fa-whatsapp text-sm"></i> Salin Laporan WhatsApp
+                    </button>
+                    <button type="button" onclick="saveHistory()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs py-2.5 px-3 rounded-xl transition flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/20" title="Simpan ke Riwayat">
+                        <i class="fa-solid fa-floppy-disk"></i> Simpan
+                    </button>
+                    <button type="button" onclick="resetForm()" class="bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs py-2.5 px-3 rounded-xl transition" title="Reset">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loss Breakdown Itemized Card -->
+            <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-xl p-5 sm:p-6 space-y-4">
+                <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2 pb-3 border-b border-slate-700">
+                    <i class="fa-solid fa-list-check text-blue-400"></i> Rincian Link Budget Detail
+                </h3>
+
+                <div class="space-y-3 text-xs">
+                    <div class="flex justify-between items-center py-1.5 border-b border-slate-700/40">
+                        <span class="text-slate-300 flex items-center gap-2">
+                            <i class="fa-solid fa-server text-slate-500 w-4"></i> Daya SFP Server (TX)
+                        </span>
+                        <span id="detailTxPower" class="font-semibold text-blue-400">+5.00 dBm</span>
+                    </div>
+
+                    <div class="flex justify-between items-center py-1.5 border-b border-slate-700/40">
+                        <span class="text-slate-300 flex items-center gap-2">
+                            <i class="fa-solid fa-code-branch text-slate-500 w-4"></i> Total Splitter (Cascading)
+                        </span>
+                        <span id="detailSplitterLoss" class="font-semibold text-slate-100">17.70 dB</span>
+                    </div>
+
+                    <div class="flex justify-between items-center py-1.5 border-b border-slate-700/40">
+                        <span class="text-slate-300 flex items-center gap-2">
+                            <i class="fa-solid fa-wave-square text-slate-500 w-4"></i> Redaman Kabel Optik
+                        </span>
+                        <span id="detailCableLoss" class="font-semibold text-slate-100">1.23 dB</span>
+                    </div>
+
+                    <div class="flex justify-between items-center py-1.5 border-b border-slate-700/40">
+                        <span class="text-slate-300 flex items-center gap-2">
+                            <i class="fa-solid fa-bolt text-slate-500 w-4"></i> Sambungan Splicing
+                        </span>
+                        <span id="detailSplicingLoss" class="font-semibold text-slate-100">0.15 dB</span>
+                    </div>
+
+                    <div class="flex justify-between items-center py-1.5">
+                        <span class="text-slate-300 flex items-center gap-2">
+                            <i class="fa-solid fa-plug text-slate-500 w-4"></i> Konektor / Adaptor
+                        </span>
+                        <span id="detailConnectorLoss" class="font-semibold text-slate-100">1.00 dB</span>
+                    </div>
+                </div>
+
+                <!-- Info Note -->
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700/50 text-[11px] text-slate-400 flex items-start gap-2">
+                    <i class="fa-solid fa-circle-info text-blue-400 mt-0.5"></i>
+                    <p>Standar GPON: <strong>Aman (-8 s.d -24 dBm)</strong> &bull; <strong>Waspada (-25 s.d -27 dBm)</strong> &bull; <strong>Gagal (&lt; -27 dBm)</strong>.</p>
+                </div>
+            </div>
+
+            <!-- Card: Riwayat / Saved ODP Calculation History -->
+            <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-xl p-5 sm:p-6 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-700">
+                    <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-blue-400"></i> Riwayat Tersimpan (<span id="historyCount">0</span>)
+                    </h3>
+                    <button type="button" onclick="clearHistory()" class="text-xs text-rose-400 hover:text-rose-300 transition">Hapus Semua</button>
+                </div>
+
+                <div id="historyContainer" class="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+                    <p class="text-xs text-slate-500 text-center py-4">Belum ada riwayat tersimpan. Klik tombol "Simpan" di atas untuk merekam hasil kalkulasi.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Toast Notification Popup -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 text-xs font-semibold">
+        <i class="fa-solid fa-check-circle text-base"></i>
+        <span id="toastMsg">Berhasil menyalin laporan ke clipboard!</span>
+    </div>
+
+    <footer class="bg-slate-800 border-t border-slate-700 py-4 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-400">
+            GPON FTTH Link Budget Calculator &bull; Profesional Fiber Optic Tool (PWA Offline Ready)
+        </div>
+    </footer>
+
+    <script>
+        // Inline Dynamic Manifest Data URI for PWA without external file requirement
+        const manifestData = {
+            name: "FO Link Budget Pro",
+            short_name: "FO Pro",
+            start_url: "./",
+            display: "standalone",
+            background_color: "#0f172a",
+            theme_color: "#0f172a",
+            icons: [
+                {
+                    src: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/svgs/solid/network-wired.svg",
+                    sizes: "512x512",
+                    type: "image/svg+xml"
+                }
+            ]
+        };
+        const stringManifest = JSON.stringify(manifestData);
+        const blob = new Blob([stringManifest], {type: 'application/json'});
+        document.getElementById('pwaManifest').setAttribute('href', URL.createObjectURL(blob));
+
+        // Register Service Worker for Offline Capabilities
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                self.addEventListener('install', (e) => {
+                    e.waitUntil(
+                        caches.open('fo-pro-cache-v1').then((cache) => {
+                            return cache.addAll(['./']);
+                        })
+                    );
+                });
+                self.addEventListener('fetch', (e) => {
+                    e.respondWith(
+                        caches.match(e.request).then((response) => {
+                            return response || fetch(e.request);
+                        })
+                    );
+                });
+            `;
+            const swBlob = new Blob([swCode], {type: 'text/javascript'});
+            const swUrl = URL.createObjectURL(swBlob);
+            navigator.serviceWorker.register(swUrl).catch(err => console.log('SW registration failed:', err));
+        }
+
+        // PWA Install Prompt handling
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'flex';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        });
+
+        // Mapping input elements
+        const odpNameEl = document.getElementById('odpName');
+        const odpNoteEl = document.getElementById('odpNote');
+        const sfpPresetEl = document.getElementById('sfpPreset');
+        const txPowerEl = document.getElementById('txPower');
+        const splitter1El = document.getElementById('splitter1');
+        const splitter2El = document.getElementById('splitter2');
+        const loss1Desc = document.getElementById('loss1-desc');
+        const loss2Desc = document.getElementById('loss2-desc');
+        const wavelengthEl = document.getElementById('wavelength');
+        const cableDistanceEl = document.getElementById('cableDistance');
+        const lossPerKmEl = document.getElementById('lossPerKm');
+        const splicingCountEl = document.getElementById('splicingCount');
+        const connectorCountEl = document.getElementById('connectorCount');
+
+        // Result output elements
+        const rxPowerValEl = document.getElementById('rxPowerVal');
+        const totalLossValEl = document.getElementById('totalLossVal');
+        const statusBadge = document.getElementById('statusBadge');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const statusMessageBox = document.getElementById('statusMessageBox');
+        const msgTitle = document.getElementById('msgTitle');
+        const msgDesc = document.getElementById('msgDesc');
+
+        // Breakdown elements
+        const detailTxPower = document.getElementById('detailTxPower');
+        const detailSplitterLoss = document.getElementById('detailSplitterLoss');
+        const detailCableLoss = document.getElementById('detailCableLoss');
+        const detailSplicingLoss = document.getElementById('detailSplicingLoss');
+        const detailConnectorLoss = document.getElementById('detailConnectorLoss');
+
+        // History container & count
+        const historyContainer = document.getElementById('historyContainer');
+        const historyCountEl = document.getElementById('historyCount');
+
+        // Toast notification element
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+
+        // Auto-adjust default cable attenuation coefficient based on selected wavelength
+        wavelengthEl.addEventListener('change', function() {
+            const wl = this.value;
+            if (wl === '1310') {
+                lossPerKmEl.value = '0.38';
+            } else if (wl === '1490') {
+                lossPerKmEl.value = '0.35';
+            } else if (wl === '1550') {
+                lossPerKmEl.value = '0.25';
+            }
+            calculate();
+        });
+
+        // SFP preset dropdown handler
+        sfpPresetEl.addEventListener('change', function() {
+            if (this.value !== 'custom') {
+                txPowerEl.value = this.value;
+                calculate();
+            }
+        });
+
+        // Manual text input updates preset to custom if changed manually
+        txPowerEl.addEventListener('input', function() {
+            sfpPresetEl.value = 'custom';
+            calculate();
+        });
+
+        // Quick Preset function requested by user for splitters
+        function setSplitterPreset(val1, val2) {
+            splitter1El.value = val1;
+            splitter2El.value = val2;
+            calculate();
+        }
+
+        function resetForm() {
+            odpNameEl.value = 'ODP-SMP-01 / Pelanggan Baru';
+            odpNoteEl.value = 'Jalur Standar';
+            sfpPresetEl.value = '5.0';
+            txPowerEl.value = '5.0';
+            splitter1El.value = '10.5';
+            splitter2El.value = '7.2';
+            wavelengthEl.value = '1490';
+            cableDistanceEl.value = '3.5';
+            lossPerKmEl.value = '0.35';
+            splicingCountEl.value = '3';
+            connectorCountEl.value = '2';
+            calculate();
+        }
+
+        // Main calculation function triggered on any input change
+        function calculate() {
+            const tx = parseFloat(txPowerEl.value) || 0;
+            const s1Loss = parseFloat(splitter1El.value) || 0;
+            const s2Loss = parseFloat(splitter2El.value) || 0;
+            const distance = parseFloat(cableDistanceEl.value) || 0;
+            const lossPerKm = parseFloat(lossPerKmEl.value) || 0;
+            const splCount = parseInt(splicingCountEl.value) || 0;
+            const connCount = parseInt(connectorCountEl.value) || 0;
+
+            // Update splitter description text
+            loss1Desc.innerText = `Redaman: ${s1Loss > 0 ? s1Loss + ' dB' : '0 dB'}`;
+            loss2Desc.innerText = `Redaman: ${s2Loss > 0 ? s2Loss + ' dB' : '0 dB'}`;
+
+            // Calculate specific sub-losses
+            const totalSplitterLoss = s1Loss + s2Loss;
+            const cableLoss = distance * lossPerKm;
+            const splicingLoss = splCount * 0.05; // Standard 0.05 dB per splice
+            const connectorLoss = connCount * 0.5; // Standard 0.5 dB per connector/adaptor
+
+            // Total System Loss calculation
+            const totalLoss = totalSplitterLoss + cableLoss + splicingLoss + connectorLoss;
+
+            // Final Receiver Power (RX Power) = TX Power - Total Loss
+            const rxPower = tx - totalLoss;
+
+            // Update breakdown display UI
+            detailTxPower.innerText = (tx >= 0 ? '+' : '') + tx.toFixed(2) + ' dBm';
+            detailSplitterLoss.innerText = totalSplitterLoss.toFixed(2) + ' dB';
+            detailCableLoss.innerText = cableLoss.toFixed(2) + ' dB';
+            detailSplicingLoss.innerText = splicingLoss.toFixed(2) + ' dB';
+            detailConnectorLoss.innerText = connectorLoss.toFixed(2) + ' dB';
+
+            // Display results
+            totalLossValEl.innerText = totalLoss.toFixed(2);
+            rxPowerValEl.innerText = rxPower.toFixed(2);
+
+            // Determine status and dynamic styling according to GPON standards
+            if (rxPower > -8.0) {
+                setStatusStyle('warning', 'Terlalu Tinggi / Overload (> -8 dBm)', 'Daya terima terlalu kuat. Berisiko menyebabkan saturasi pada receiver ONU.', 'bg-amber-950/40 border-amber-800/50 text-amber-200', 'text-amber-400', 'bg-amber-400', 'border-amber-500/30 text-amber-400 bg-amber-500/20');
+            } else if (rxPower >= -24.0) {
+                setStatusStyle('normal', 'Sinyal Layak & Ideal (-8 s.d -24 dBm)', 'Nilai RX Power berada dalam rentang optimal GPON. Layanan internet stabil.', 'bg-emerald-950/40 border-emerald-800/50 text-emerald-200', 'text-emerald-400', 'bg-emerald-400', 'border-emerald-500/30 text-emerald-400 bg-emerald-500/20');
+            } else if (rxPower >= -27.0) {
+                setStatusStyle('warning', 'Waspada / Margin Tipis (-25 s.d -27 dBm)', 'RX Power mendekati batas minimum sensitivitas. Rentan gangguan cuaca.', 'bg-amber-950/40 border-amber-800/50 text-amber-200', 'text-amber-400', 'bg-amber-400', 'border-amber-500/30 text-amber-400 bg-amber-500/20');
+            } else {
+                setStatusStyle('danger', 'Gagal / No Link (< -27 dBm)', 'Sinyal terlalu lemah atau jalur terputus/kotor. Perlu pengecekan fisik.', 'bg-rose-950/40 border-rose-800/50 text-rose-200', 'text-rose-400', 'bg-rose-500 animate-ping', 'border-rose-500/30 text-rose-400 bg-rose-500/20');
+            }
+        }
+
+        function setStatusStyle(type, title, desc, boxClass, iconColor, dotColor, badgeClass) {
+            msgTitle.innerText = title;
+            msgDesc.innerText = desc;
+            statusMessageBox.className = `rounded-xl p-3.5 text-xs flex items-start gap-2.5 border ${boxClass}`;
+            statusMessageBox.querySelector('i').className = `fa-solid ${type === 'danger' ? 'fa-triangle-exclamation' : type === 'warning' ? 'fa-triangle-exclamation' : 'fa-circle-check'} ${iconColor} text-base mt-0.5`;
+            msgTitle.className = `font-semibold block mb-0.5 ${iconColor}`;
+            statusDot.className = `w-2 h-2 rounded-full ${dotColor}`;
+            statusText.innerText = title.split(' ')[0];
+            statusBadge.className = `absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase flex items-center gap-1.5 border ${badgeClass}`;
+        }
+
+        // Copy WhatsApp Report function including ODP Name & Notes
+        function copyReport() {
+            const name = odpNameEl.value || 'Tanpa Nama ODP';
+            const note = odpNoteEl.value || '-';
+            const tx = txPowerEl.value;
+            const s1 = splitter1El.options[splitter1El.selectedIndex].text;
+            const s2 = splitter2El.options[splitter2El.selectedIndex].text;
+            const dist = cableDistanceEl.value;
+            const wl = wavelengthEl.value;
+            const totalLoss = totalLossValEl.innerText;
+            const rxPower = rxPowerValEl.innerText;
+            const status = statusText.innerText;
+
+            const text = `*LAPORAN LINK BUDGET GPON* 🌐\n` +
+                         `------------------------------------\n` +
+                         `📍 *Lokasi/ODP:* ${name}\n` +
+                         `📝 *Catatan:* ${note}\n` +
+                         `🔹 *TX SFP Server:* +${tx} dBm\n` +
+                         `🔹 *Splitter 1:* ${s1}\n` +
+                         `🔹 *Splitter 2:* ${s2}\n` +
+                         `🔹 *Panjang Kabel:* ${dist} km (${wl} nm)\n` +
+                         `------------------------------------\n` +
+                         `📉 *Total Redaman:* ${totalLoss} dB\n` +
+                         `📶 *Daya Terima (RX):* ${rxPower} dBm\n` +
+                         `📌 *Status Link:* ${status}\n` +
+                         `------------------------------------`;
+
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = text;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+
+            showToast("Berhasil menyalin laporan WhatsApp!");
+        }
+
+        // LocalStorage History Management
+        function getHistory() {
+            try {
+                return JSON.parse(localStorage.getItem('gpon_history')) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveHistory() {
+            const item = {
+                id: Date.now(),
+                name: odpNameEl.value || 'ODP Tanpa Nama',
+                note: odpNoteEl.value || '',
+                rxPower: rxPowerValEl.innerText,
+                totalLoss: totalLossValEl.innerText,
+                status: statusText.innerText,
+                date: new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+            };
+
+            const history = getHistory();
+            history.unshift(item);
+            if (history.length > 20) history.pop();
+
+            localStorage.setItem('gpon_history', JSON.stringify(history));
+            renderHistory();
+            showToast("Hasil perhitungan berhasil disimpan!");
+        }
+
+        function deleteHistoryItem(id) {
+            let history = getHistory();
+            history = history.filter(item => item.id !== id);
+            localStorage.setItem('gpon_history', JSON.stringify(history));
+            renderHistory();
+            showToast("Riwayat berhasil dihapus");
+        }
+
+        function clearHistory() {
+            localStorage.removeItem('gpon_history');
+            renderHistory();
+            showToast("Semua riwayat dibersihkan");
+        }
+
+        function renderHistory() {
+            const history = getHistory();
+            historyCountEl.innerText = history.length;
+
+            if (history.length === 0) {
+                historyContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">Belum ada riwayat tersimpan. Klik tombol "Simpan" di atas untuk merekam hasil kalkulasi.</p>`;
+                return;
+            }
+
+            historyContainer.innerHTML = history.map(item => {
+                const statusColor = item.status === 'Aman' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 'text-amber-400 bg-amber-500/10 border-amber-500/20';
+                return `
+                    <div class="bg-slate-900/70 border border-slate-700/60 rounded-xl p-3 flex items-center justify-between gap-3 text-xs">
+                        <div class="space-y-1 overflow-hidden">
+                            <div class="font-semibold text-white truncate flex items-center gap-1.5">
+                                <i class="fa-solid fa-tower-cell text-blue-400"></i> ${escapeHtml(item.name)}
+                            </div>
+                            <div class="text-[11px] text-slate-400 truncate">${escapeHtml(item.note)} &bull; ${item.date}</div>
+                        </div>
+                        <div class="flex items-center space-x-3 shrink-0">
+                            <div class="text-right">
+                                <div class="font-bold text-blue-400">${item.rxPower} dBm</div>
+                                <span class="text-[10px] px-2 py-0.5 rounded border ${statusColor}">${item.status}</span>
+                            </div>
+                            <button onclick="deleteHistoryItem(${item.id})" class="text-slate-500 hover:text-rose-400 p-1 transition" title="Hapus item">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        function showToast(msg) {
+            toastMsg.innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Attach event listeners to all inputs for real-time live update
+        const inputs = [odpNameEl, odpNoteEl, txPowerEl, splitter1El, splitter2El, wavelengthEl, cableDistanceEl, lossPerKmEl, splicingCountEl, connectorCountEl];
+        inputs.forEach(el => {
+            el.addEventListener('input', calculate);
+            el.addEventListener('change', calculate);
+        });
+
+        // Run initial calculation and render history on page load
+        window.onload = function() {
+            calculate();
+            renderHistory();
+        };
+    </script>
+</body>
+</html>
